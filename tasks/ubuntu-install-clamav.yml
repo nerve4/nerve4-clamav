@@ -1,0 +1,6 @@
+---
+# tasks - ubuntu-install-clamav.yml for nerve4-clamav
+
+- name: Install ClamAV packages on Ubuntu
+  ansible.builtin.apt:
+    pkg: "{{ ubuntu_pkgs }}"
