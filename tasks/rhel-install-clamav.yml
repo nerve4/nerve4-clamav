@@ -1,0 +1,40 @@
+---
+# tasks - rhel-install-clamav.yml for nerve4-clamav
+
+- name: Install Epel on Rhel 7.x
+  ansible.builtin.yum:
+    name: "epel-release"
+    state: present
+  when:
+    - ansible_distribution_major_version == "7"
+
+- name: Install Epel on Rhel 8.x / Rocky Linux
+  ansible.builtin.dnf:
+    name: "epel-release"
+    state: present
+  when:
+    (ansible_distribution_major_version == "8") or
+    (ansible_distribution in "Rocky")
+
+- name: Install ClamAV packages on Rhel 7.x
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ rhel_pkgs }}"
+  when:
+    - ansible_distribution_major_version == "7"
+
+- name: Install ClamAV packages on Rhel 8.x / Rocky Linux
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ rhel_pkgs }}"
+  when:
+    (ansible_distribution_major_version == "8") or
+    (ansible_distribution in "Rocky")
+
+- name: Configure SElinux
+  become: yes
+  ansible.builtin.shell: |
+    sudo setsebool -P antivirus_can_scan_system 1
+    sudo setsebool -P clamd_use_jit 1

@@ -1,0 +1,55 @@
+---
+# tasks - configure-clamav.yml for nerve4-clamav
+
+- name: "Upload scan.conf on Rhel 8.x / Rocky Linux"
+  ansible.builtin.template:
+    src: "rhel-scan.j2"
+    dest: "/etc/{{ rhel_dir }}/scan.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    (ansible_distribution == "CentOS") or
+    (ansible_distribution == "RedHat") or
+    (ansible_distribution in "Rocky")
+
+- name: "Upload freshclam.conf on Rhel 8.x / Rocky Linux"
+  ansible.builtin.template:
+    src: "rhel-freshclam.j2"
+    dest: "/etc/freshclam.conf"
+    owner: root
+    group: root
+    mode: '0600'
+  when:
+    (ansible_distribution == "CentOS") or
+    (ansible_distribution == "RedHat") or
+    (ansible_distribution in "Rocky")
+
+- name: Stop ClamAV svc on Ubuntu
+  ansible.builtin.systemd:
+    name: "clamav-freshclam"
+    state: stopped
+  when:
+    - ansible_distribution == "Ubuntu"
+
+- name: Run freshclam svc
+  become: yes
+  ansible.builtin.shell: |
+    sudo freshclam
+
+- name: Enable and restart ClamAV svc on Rhel/Rocky
+  ansible.builtin.systemd:
+    name: "clamd@scan"
+    state: restarted
+    enabled: yes
+  when:
+    (ansible_distribution in "CentOS") or
+    (ansible_distribution in "RedHat") or
+    (ansible_distribution in "Rocky")
+
+- name: Start ClamAV svc on Ubuntu
+  ansible.builtin.systemd:
+    name: "clamav-freshclam"
+    state: started
+  when:
+    - ansible_distribution == "Ubuntu"

@@ -1,0 +1,25 @@
+---
+# tasks - main.yml for nerve4-clamav
+
+- name: "Check if the clamav is exists on Rhel"
+  stat:
+    path: "/etc/{{ rhel_dir }}"
+  register: crhel_check
+
+- name: "Check if the clamav is exists on Ubuntu"
+  stat:
+    path: "/etc/{{ ubuntu_dir }}"
+  register: cubuntu_check
+
+- include: rhel-install-clamav.yml
+  when:
+    (crhel_check.stat.exists == False and ansible_distribution == "CentOS") or
+    (crhel_check.stat.exists == False and ansible_distribution == "RedHat") or
+    (crhel_check.stat.exists == False and ansible_distribution in "Rocky")
+
+- include: ubuntu-install-clamav.yml
+  when:
+    - cubuntu_check.stat.exists == False
+    - ansible_distribution == "Ubuntu"
+
+- include: configure-clamav.yml
