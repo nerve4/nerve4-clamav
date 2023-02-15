@@ -1,0 +1,25 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: nerve4 - Lee
+  description: Install clamAV to Nix Servers
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.4
+  platforms:
+    - name: RedHet
+      versions:
+        - 7
+        - 8
+    - name: Rocky
+      versions:
+        - 9
+    - name: Ubuntu
+      versions:
+        - 20
+        - 22
+  galaxy_tags:
+    - clamav
+    - AntiVirus
+
+allow_duplicates: true
